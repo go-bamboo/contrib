@@ -4,9 +4,9 @@ package v2
 //go:generate abigen --abi contract/dodoAbi.json --pkg contract --out contract/dodo.go
 
 import (
-	"github.com/emberfarkas/pkg/contracts/dodoex/v2/contract"
 	"github.com/ethereum/go-ethereum/accounts/abi/bind"
 	"github.com/ethereum/go-ethereum/common"
+	"github.com/go-bamboo/contrib/contracts/dodoex/v2/contract"
 	"github.com/go-kratos/kratos/v2/errors"
 )
 

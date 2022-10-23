@@ -9,11 +9,11 @@ import (
 	"crypto/ecdsa"
 	"math/big"
 
-	"github.com/emberfarkas/pkg/contracts/bridge/contract"
 	"github.com/ethereum/go-ethereum/accounts/abi/bind"
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/common/hexutil"
 	"github.com/ethereum/go-ethereum/rlp"
+	"github.com/go-bamboo/contrib/contracts/bridge/contract"
 	"github.com/go-kratos/kratos/v2/errors"
 )
 

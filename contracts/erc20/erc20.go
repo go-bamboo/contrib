@@ -6,9 +6,9 @@ import (
 	"context"
 	"math/big"
 
-	"github.com/emberfarkas/pkg/contracts/erc20/contract"
 	"github.com/ethereum/go-ethereum/accounts/abi/bind"
 	"github.com/ethereum/go-ethereum/common"
+	"github.com/go-bamboo/contrib/contracts/erc20/contract"
 	"github.com/go-kratos/kratos/v2/errors"
 )
 

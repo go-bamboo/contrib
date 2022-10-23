@@ -4,8 +4,8 @@ go 1.18
 
 require (
 	github.com/confluentinc/confluent-kafka-go v1.9.2
-	github.com/emberfarkas/pkg v0.0.3
 	github.com/ethereum/go-ethereum v1.10.25
+	github.com/go-bamboo/pkg v0.0.4
 	github.com/go-kratos/kratos/v2 v2.5.2
 	go.opentelemetry.io/otel v1.11.1
 	go.opentelemetry.io/otel/trace v1.11.1
@@ -14,6 +14,7 @@ require (
 
 require (
 	github.com/StackExchange/wmi v1.2.1 // indirect
+	github.com/bmizerany/assert v0.0.0-20160611221934-b7ed37b82869 // indirect
 	github.com/btcsuite/btcd/btcec/v2 v2.2.0 // indirect
 	github.com/deckarep/golang-set v1.8.0 // indirect
 	github.com/decred/dcrd/dcrec/secp256k1/v4 v4.0.1 // indirect
@@ -36,7 +37,7 @@ require (
 	github.com/tinylib/msgp v1.1.6 // indirect
 	github.com/tklauser/go-sysconf v0.3.10 // indirect
 	github.com/tklauser/numcpus v0.4.0 // indirect
-	go.opentelemetry.io/otel/exporters/jaeger v1.9.0 // indirect
+	go.opentelemetry.io/otel/exporters/jaeger v1.11.0 // indirect
 	go.opentelemetry.io/otel/exporters/stdout/stdoutmetric v0.32.3 // indirect
 	go.opentelemetry.io/otel/exporters/stdout/stdouttrace v1.11.0 // indirect
 	go.opentelemetry.io/otel/metric v0.32.3 // indirect

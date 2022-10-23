@@ -8,12 +8,12 @@ import (
 	"crypto/ecdsa"
 	"math/big"
 
-	"github.com/emberfarkas/pkg/contracts/flattened/contract"
 	"github.com/ethereum/go-ethereum/accounts/abi/bind"
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/common/hexutil"
 	"github.com/ethereum/go-ethereum/core/types"
 	"github.com/ethereum/go-ethereum/rlp"
+	"github.com/go-bamboo/contrib/contracts/flattened/contract"
 	"github.com/go-kratos/kratos/v2/errors"
 )
 
