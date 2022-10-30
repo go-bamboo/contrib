@@ -11,6 +11,7 @@ import (
 	"net/mail"
 	"net/url"
 	"regexp"
+	"sort"
 	"strings"
 	"time"
 	"unicode/utf8"
@@ -31,14 +32,29 @@ var (
 	_ = (*url.URL)(nil)
 	_ = (*mail.Address)(nil)
 	_ = anypb.Any{}
+	_ = sort.Sort
 )
 
 // Validate checks the field values on SASL with the rules defined in the proto
-// definition for this message. If any rules are violated, an error is returned.
+// definition for this message. If any rules are violated, the first error
+// encountered is returned, or nil if there are no violations.
 func (m *SASL) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on SASL with the rules defined in the
+// proto definition for this message. If any rules are violated, the result is
+// a list of violation errors wrapped in SASLMultiError, or nil if none found.
+func (m *SASL) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *SASL) validate(all bool) error {
 	if m == nil {
 		return nil
 	}
+
+	var errors []error
 
 	// no validation rules for Mechanisms
 
@@ -46,8 +62,28 @@ func (m *SASL) Validate() error {
 
 	// no validation rules for Password
 
+	if len(errors) > 0 {
+		return SASLMultiError(errors)
+	}
+
 	return nil
 }
+
+// SASLMultiError is an error wrapping multiple validation errors returned by
+// SASL.ValidateAll() if the designated constraints aren't met.
+type SASLMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m SASLMultiError) Error() string {
+	var msgs []string
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m SASLMultiError) AllErrors() []error { return m }
 
 // SASLValidationError is the validation error returned by SASL.Validate if the
 // designated constraints aren't met.
@@ -104,18 +140,52 @@ var _ interface {
 } = SASLValidationError{}
 
 // Validate checks the field values on SSL with the rules defined in the proto
-// definition for this message. If any rules are violated, an error is returned.
+// definition for this message. If any rules are violated, the first error
+// encountered is returned, or nil if there are no violations.
 func (m *SSL) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on SSL with the rules defined in the
+// proto definition for this message. If any rules are violated, the result is
+// a list of violation errors wrapped in SSLMultiError, or nil if none found.
+func (m *SSL) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *SSL) validate(all bool) error {
 	if m == nil {
 		return nil
 	}
+
+	var errors []error
 
 	// no validation rules for CaLocation
 
 	// no validation rules for CaPem
 
+	if len(errors) > 0 {
+		return SSLMultiError(errors)
+	}
+
 	return nil
 }
+
+// SSLMultiError is an error wrapping multiple validation errors returned by
+// SSL.ValidateAll() if the designated constraints aren't met.
+type SSLMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m SSLMultiError) Error() string {
+	var msgs []string
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m SSLMultiError) AllErrors() []error { return m }
 
 // SSLValidationError is the validation error returned by SSL.Validate if the
 // designated constraints aren't met.
@@ -171,20 +241,54 @@ var _ interface {
 	ErrorName() string
 } = SSLValidationError{}
 
-// Validate checks the field values on Conf with the rules defined in the proto
-// definition for this message. If any rules are violated, an error is returned.
-func (m *Conf) Validate() error {
+// Validate checks the field values on ConsumerConf with the rules defined in
+// the proto definition for this message. If any rules are violated, the first
+// error encountered is returned, or nil if there are no violations.
+func (m *ConsumerConf) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on ConsumerConf with the rules defined
+// in the proto definition for this message. If any rules are violated, the
+// result is a list of violation errors wrapped in ConsumerConfMultiError, or
+// nil if none found.
+func (m *ConsumerConf) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *ConsumerConf) validate(all bool) error {
 	if m == nil {
 		return nil
 	}
+
+	var errors []error
 
 	// no validation rules for BootstrapServers
 
 	// no validation rules for SecurityProtocol
 
-	if v, ok := interface{}(m.GetSasl()).(interface{ Validate() error }); ok {
+	if all {
+		switch v := interface{}(m.GetSasl()).(type) {
+		case interface{ ValidateAll() error }:
+			if err := v.ValidateAll(); err != nil {
+				errors = append(errors, ConsumerConfValidationError{
+					field:  "Sasl",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		case interface{ Validate() error }:
+			if err := v.Validate(); err != nil {
+				errors = append(errors, ConsumerConfValidationError{
+					field:  "Sasl",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		}
+	} else if v, ok := interface{}(m.GetSasl()).(interface{ Validate() error }); ok {
 		if err := v.Validate(); err != nil {
-			return ConfValidationError{
+			return ConsumerConfValidationError{
 				field:  "Sasl",
 				reason: "embedded message failed validation",
 				cause:  err,
@@ -192,9 +296,28 @@ func (m *Conf) Validate() error {
 		}
 	}
 
-	if v, ok := interface{}(m.GetSsl()).(interface{ Validate() error }); ok {
+	if all {
+		switch v := interface{}(m.GetSsl()).(type) {
+		case interface{ ValidateAll() error }:
+			if err := v.ValidateAll(); err != nil {
+				errors = append(errors, ConsumerConfValidationError{
+					field:  "Ssl",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		case interface{ Validate() error }:
+			if err := v.Validate(); err != nil {
+				errors = append(errors, ConsumerConfValidationError{
+					field:  "Ssl",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		}
+	} else if v, ok := interface{}(m.GetSsl()).(interface{ Validate() error }); ok {
 		if err := v.Validate(); err != nil {
-			return ConfValidationError{
+			return ConsumerConfValidationError{
 				field:  "Ssl",
 				reason: "embedded message failed validation",
 				cause:  err,
@@ -202,38 +325,34 @@ func (m *Conf) Validate() error {
 		}
 	}
 
-	// no validation rules for Topic
-
 	// no validation rules for Group
 
-	if v, ok := interface{}(m.GetReadTimeout()).(interface{ Validate() error }); ok {
-		if err := v.Validate(); err != nil {
-			return ConfValidationError{
-				field:  "ReadTimeout",
-				reason: "embedded message failed validation",
-				cause:  err,
-			}
-		}
+	if len(errors) > 0 {
+		return ConsumerConfMultiError(errors)
 	}
-
-	if v, ok := interface{}(m.GetWriteTimeout()).(interface{ Validate() error }); ok {
-		if err := v.Validate(); err != nil {
-			return ConfValidationError{
-				field:  "WriteTimeout",
-				reason: "embedded message failed validation",
-				cause:  err,
-			}
-		}
-	}
-
-	// no validation rules for Acks
 
 	return nil
 }
 
-// ConfValidationError is the validation error returned by Conf.Validate if the
-// designated constraints aren't met.
-type ConfValidationError struct {
+// ConsumerConfMultiError is an error wrapping multiple validation errors
+// returned by ConsumerConf.ValidateAll() if the designated constraints aren't met.
+type ConsumerConfMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m ConsumerConfMultiError) Error() string {
+	var msgs []string
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m ConsumerConfMultiError) AllErrors() []error { return m }
+
+// ConsumerConfValidationError is the validation error returned by
+// ConsumerConf.Validate if the designated constraints aren't met.
+type ConsumerConfValidationError struct {
 	field  string
 	reason string
 	cause  error
@@ -241,22 +360,22 @@ type ConfValidationError struct {
 }
 
 // Field function returns field value.
-func (e ConfValidationError) Field() string { return e.field }
+func (e ConsumerConfValidationError) Field() string { return e.field }
 
 // Reason function returns reason value.
-func (e ConfValidationError) Reason() string { return e.reason }
+func (e ConsumerConfValidationError) Reason() string { return e.reason }
 
 // Cause function returns cause value.
-func (e ConfValidationError) Cause() error { return e.cause }
+func (e ConsumerConfValidationError) Cause() error { return e.cause }
 
 // Key function returns key value.
-func (e ConfValidationError) Key() bool { return e.key }
+func (e ConsumerConfValidationError) Key() bool { return e.key }
 
 // ErrorName returns error name.
-func (e ConfValidationError) ErrorName() string { return "ConfValidationError" }
+func (e ConsumerConfValidationError) ErrorName() string { return "ConsumerConfValidationError" }
 
 // Error satisfies the builtin error interface
-func (e ConfValidationError) Error() string {
+func (e ConsumerConfValidationError) Error() string {
 	cause := ""
 	if e.cause != nil {
 		cause = fmt.Sprintf(" | caused by: %v", e.cause)
@@ -268,14 +387,14 @@ func (e ConfValidationError) Error() string {
 	}
 
 	return fmt.Sprintf(
-		"invalid %sConf.%s: %s%s",
+		"invalid %sConsumerConf.%s: %s%s",
 		key,
 		e.field,
 		e.reason,
 		cause)
 }
 
-var _ error = ConfValidationError{}
+var _ error = ConsumerConfValidationError{}
 
 var _ interface {
 	Field() string
@@ -283,4 +402,175 @@ var _ interface {
 	Key() bool
 	Cause() error
 	ErrorName() string
-} = ConfValidationError{}
+} = ConsumerConfValidationError{}
+
+// Validate checks the field values on ProducerConf with the rules defined in
+// the proto definition for this message. If any rules are violated, the first
+// error encountered is returned, or nil if there are no violations.
+func (m *ProducerConf) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on ProducerConf with the rules defined
+// in the proto definition for this message. If any rules are violated, the
+// result is a list of violation errors wrapped in ProducerConfMultiError, or
+// nil if none found.
+func (m *ProducerConf) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *ProducerConf) validate(all bool) error {
+	if m == nil {
+		return nil
+	}
+
+	var errors []error
+
+	// no validation rules for BootstrapServers
+
+	// no validation rules for SecurityProtocol
+
+	if all {
+		switch v := interface{}(m.GetSasl()).(type) {
+		case interface{ ValidateAll() error }:
+			if err := v.ValidateAll(); err != nil {
+				errors = append(errors, ProducerConfValidationError{
+					field:  "Sasl",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		case interface{ Validate() error }:
+			if err := v.Validate(); err != nil {
+				errors = append(errors, ProducerConfValidationError{
+					field:  "Sasl",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		}
+	} else if v, ok := interface{}(m.GetSasl()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return ProducerConfValidationError{
+				field:  "Sasl",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
+	if all {
+		switch v := interface{}(m.GetSsl()).(type) {
+		case interface{ ValidateAll() error }:
+			if err := v.ValidateAll(); err != nil {
+				errors = append(errors, ProducerConfValidationError{
+					field:  "Ssl",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		case interface{ Validate() error }:
+			if err := v.Validate(); err != nil {
+				errors = append(errors, ProducerConfValidationError{
+					field:  "Ssl",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		}
+	} else if v, ok := interface{}(m.GetSsl()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return ProducerConfValidationError{
+				field:  "Ssl",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
+	// no validation rules for RequestRequiredAcks
+
+	// no validation rules for Acks
+
+	// no validation rules for Partitioner
+
+	// no validation rules for RequestTimeoutMs
+
+	// no validation rules for Topic
+
+	if len(errors) > 0 {
+		return ProducerConfMultiError(errors)
+	}
+
+	return nil
+}
+
+// ProducerConfMultiError is an error wrapping multiple validation errors
+// returned by ProducerConf.ValidateAll() if the designated constraints aren't met.
+type ProducerConfMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m ProducerConfMultiError) Error() string {
+	var msgs []string
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m ProducerConfMultiError) AllErrors() []error { return m }
+
+// ProducerConfValidationError is the validation error returned by
+// ProducerConf.Validate if the designated constraints aren't met.
+type ProducerConfValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e ProducerConfValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e ProducerConfValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e ProducerConfValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e ProducerConfValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e ProducerConfValidationError) ErrorName() string { return "ProducerConfValidationError" }
+
+// Error satisfies the builtin error interface
+func (e ProducerConfValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sProducerConf.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = ProducerConfValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = ProducerConfValidationError{}

@@ -23,7 +23,7 @@ type KafkaProducer struct {
 	topic      string
 }
 
-func MustNewPusher(c *Conf) queue.Pusher {
+func MustNewPusher(c *ProducerConf) queue.Pusher {
 	pub, err := NewPusher(c)
 	if err != nil {
 		log.Fatal(err)
@@ -31,7 +31,7 @@ func MustNewPusher(c *Conf) queue.Pusher {
 	return pub
 }
 
-func NewPusher(c *Conf) (queue.Pusher, error) {
+func NewPusher(c *ProducerConf) (queue.Pusher, error) {
 	var config = make(kafka.ConfigMap)
 	config["bootstrap.servers"] = c.BootstrapServers
 	config["api.version.request"] = true

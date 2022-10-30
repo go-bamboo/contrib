@@ -21,7 +21,7 @@ import (
 
 type (
 	kafkaQueue struct {
-		c       *Conf
+		c       *ConsumerConf
 		handler queue.ConsumeHandler
 
 		sub        *kafka.Consumer
@@ -39,7 +39,7 @@ type (
 	}
 )
 
-func MustNewQueue(c *Conf, handler queue.ConsumeHandler) queue.MessageQueue {
+func MustNewQueue(c *ConsumerConf, handler queue.ConsumeHandler) queue.MessageQueue {
 	q, err := NewQueue(c, handler)
 	if err != nil {
 		log.Fatal(err)
@@ -47,7 +47,7 @@ func MustNewQueue(c *Conf, handler queue.ConsumeHandler) queue.MessageQueue {
 	return q
 }
 
-func NewQueue(c *Conf, handler queue.ConsumeHandler) (queue.MessageQueue, error) {
+func NewQueue(c *ConsumerConf, handler queue.ConsumeHandler) (queue.MessageQueue, error) {
 	q := kafkaQueues{}
 	cc, err := newKafkaQueue(c, handler)
 	if err != nil {
@@ -75,7 +75,7 @@ func (q kafkaQueues) Stop(ctx context.Context) error {
 	return nil
 }
 
-func newKafkaQueue(c *Conf, handler queue.ConsumeHandler) (k *kafkaQueue, err error) {
+func newKafkaQueue(c *ConsumerConf, handler queue.ConsumeHandler) (k *kafkaQueue, err error) {
 	// sub
 	var config = make(kafka.ConfigMap)
 	config["bootstrap.servers"] = c.BootstrapServers
@@ -103,7 +103,7 @@ func newKafkaQueue(c *Conf, handler queue.ConsumeHandler) (k *kafkaQueue, err er
 		handler: handler,
 
 		sub:        sub,
-		tracer:     otel.Tracer("redis"),
+		tracer:     otel.Tracer("kafka"),
 		propagator: propagation.NewCompositeTextMapPropagator(tracing.Metadata{}, propagation.Baggage{}, tracing.TraceContext{}),
 
 		ctx: ctx,
@@ -113,10 +113,9 @@ func newKafkaQueue(c *Conf, handler queue.ConsumeHandler) (k *kafkaQueue, err er
 }
 
 func (c *kafkaQueue) Start(context.Context) error {
-	log.Infof("start cunsumer topic:%v", c.c.Topic)
-	topic := c.c.Topic
+	log.Infof("start cunsumer topic:%v", c.c.Topics)
 	c.wg.Add(1)
-	go c.consumGroupTopic([]string{topic})
+	go c.consumGroupTopic(c.c.Topics)
 	log.Infof("start kafka consumer.")
 	return nil
 }
@@ -151,7 +150,7 @@ func (c *kafkaQueue) poll(ctx context.Context, timeoutMs int) (cctx context.Cont
 func (c *kafkaQueue) consumGroupTopic(topics []string) {
 	defer rescue.Recover(func() {
 		c.wg.Done()
-		log.Warnf("kafka consumGroupTopic done")
+		log.Warnf("kafka consume group topic done")
 	})
 	if err := c.sub.SubscribeTopics(topics, nil); err != nil {
 		log.Errorf("Failed to get %v the list of partition: %v", topics, err)

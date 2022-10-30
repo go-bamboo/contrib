@@ -16,14 +16,23 @@ message SSL {
   string caPem = 2;
 }
 
-message Conf {
+message ConsumerConf {
   string bootstrapServers = 1;
   string securityProtocol = 2; //plaintext, ssl, sasl_plaintext, sasl_ssl
   SASL sasl = 3;
   SSL ssl = 4;
-  string topic = 5;
-  string group = 6;
-  google.protobuf.Duration read_timeout = 7;
-  google.protobuf.Duration write_timeout = 8;
-  int32 acks = 9;
+  string group = 5;
+  repeated string topics = 6;
+}
+
+message ProducerConf {
+  string bootstrapServers = 1;
+  string securityProtocol = 2; //plaintext, ssl, sasl_plaintext, sasl_ssl
+  SASL sasl = 3;
+  SSL ssl = 4;
+  int32 request_required_acks = 5;
+  int32 acks = 6;
+  string partitioner = 7;
+  int32 request_timeout_ms = 8;
+  string topic = 9;
 }
