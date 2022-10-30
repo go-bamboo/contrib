@@ -173,7 +173,7 @@ func (c *kafkaQueue) consumGroupTopic(topics []string) {
 			switch msg := ev.(type) {
 			case *kafka.Message:
 				log.Debugw("handle block msg", "headers", msg.Headers, "topic", msg.TopicPartition.Topic, "Partition", msg.TopicPartition.Partition, "Offset", msg.TopicPartition.Offset)
-				if err := c.handler.Consume(cCtx, topics[0], msg.Key, msg.Value); err != nil {
+				if err := c.handler.Consume(cCtx, *msg.TopicPartition.Topic, msg.Key, msg.Value); err != nil {
 					// 直接放弃的消息
 					se := errors.FromError(err)
 					log.Errorw(fmt.Sprintf("%+v", err), "code", se.Code, "reason", se.Reason)
