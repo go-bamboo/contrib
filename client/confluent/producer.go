@@ -20,7 +20,7 @@ type KafkaProducer struct {
 	tracer     trace.Tracer
 	propagator propagation.TextMapPropagator
 	pubCounter metrics.Counter // 发送次数
-	topic      string
+	// topic      string
 }
 
 func MustNewPusher(c *ProducerConf) queue.Pusher {
@@ -51,7 +51,7 @@ func NewPusher(c *ProducerConf) (queue.Pusher, error) {
 		pub:        pub,
 		tracer:     otel.Tracer("kafka"),
 		propagator: propagation.NewCompositeTextMapPropagator(tracing.Metadata{}, propagation.Baggage{}, tracing.TraceContext{}),
-		topic:      c.Topic,
+		// topic:      c.Topic,
 	}
 	return tracingPub, nil
 }
@@ -60,10 +60,9 @@ func (p *KafkaProducer) Name() string {
 	return "confluent"
 }
 
-func (p *KafkaProducer) Push(ctx context.Context, key, value []byte) error {
+func (p *KafkaProducer) Push(ctx context.Context, topic string, key, value []byte) error {
 	deliveryChan := make(chan kafka.Event)
 	defer close(deliveryChan)
-	topic := p.topic
 	msg := &kafka.Message{
 		TopicPartition: kafka.TopicPartition{
 			Topic:     &topic,
@@ -72,7 +71,7 @@ func (p *KafkaProducer) Push(ctx context.Context, key, value []byte) error {
 		Key:   key,
 		Value: value,
 	}
-	operation := "pub:" + p.topic
+	operation := "pub:" + topic
 	ctx, span := p.tracer.Start(ctx, operation, trace.WithSpanKind(trace.SpanKindConsumer))
 	p.propagator.Inject(ctx, &KafkaMessageTextMapCarrier{msg: msg})
 	span.SetAttributes(
