@@ -73,3 +73,5 @@ require (
 	gopkg.in/natefinch/npipe.v2 v2.0.0-20160621034901-c1b8fa8bdcce // indirect
 	gopkg.in/yaml.v3 v3.0.1 // indirect
 )
+
+replace github.com/go-kratos/kratos/v2 v2.5.2 => github.com/go-bamboo/kratos/v2 v2.4.0
