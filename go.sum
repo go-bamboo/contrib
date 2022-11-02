@@ -109,10 +109,10 @@ github.com/frankban/quicktest v1.10.0/go.mod h1:ui7WezCLWMWxVWr1GETZY3smRy0G4KWq
 github.com/frankban/quicktest v1.14.0/go.mod h1:NeW+ay9A/U67EYXNFA1nPE8e/tnQv/09mUdL/ijj8og=
 github.com/fsnotify/fsnotify v1.5.4/go.mod h1:OVB6XrOHzAwXMpEM7uPOzcehqUV2UqJxmVXmkdnm1bU=
 github.com/ghodss/yaml v1.0.0/go.mod h1:4dBDuWmgqj2HViK6kFavaiC9ZROes6MMH2rRYeMEF04=
-github.com/go-bamboo/kratos/v2 v2.4.0 h1:7wpRc3mb2mIaGuoR9jEfvire2esx46QcWTc+1WzWJYw=
-github.com/go-bamboo/kratos/v2 v2.4.0/go.mod h1:5acyLj4EgY428AJnZl2EwCrMV1OVlttQFBum+SghMiA=
-github.com/go-bamboo/pkg v0.0.10 h1:sb59MK6NJuKjsFYT1c57ZlkdZqfSvOo/95ucvgbPNPQ=
-github.com/go-bamboo/pkg v0.0.10/go.mod h1:kZY3HHdRTPw4yzhRV+49yAhQXzKLB+Phj5XcC/NHVT0=
+github.com/go-bamboo/kratos/v2 v2.5.2 h1:pThdaryHMhTjhTbTZCdP8rVl2LZx3SFSOHZ9csKVpJc=
+github.com/go-bamboo/kratos/v2 v2.5.2/go.mod h1:5acyLj4EgY428AJnZl2EwCrMV1OVlttQFBum+SghMiA=
+github.com/go-bamboo/pkg v0.0.11 h1:K2QSl6ExxMGHPR127D+PLqEvgr/FuDftVcUdVeE28F4=
+github.com/go-bamboo/pkg v0.0.11/go.mod h1:D8vnbJ5HHpXSH4vK0mup8+1X5jq4FqUWtV+W8I4lDt0=
 github.com/go-gl/glfw v0.0.0-20190409004039-e6da0acd62b1/go.mod h1:vR7hzQXu2zJy9AVAgeJqvqgH9Q5CA+iKCZ2gyEVpxRU=
 github.com/go-gl/glfw/v3.3/glfw v0.0.0-20191125211704-12ad95a8df72/go.mod h1:tQ2UAYgL5IevRw8kRxooKSPJfGvJ9fJQFa0TUsXzTg8=
 github.com/go-gl/glfw/v3.3/glfw v0.0.0-20200222043503-6f7a984d4dc4/go.mod h1:tQ2UAYgL5IevRw8kRxooKSPJfGvJ9fJQFa0TUsXzTg8=

@@ -5,7 +5,7 @@ go 1.18
 require (
 	github.com/confluentinc/confluent-kafka-go v1.9.2
 	github.com/ethereum/go-ethereum v1.10.25
-	github.com/go-bamboo/pkg v0.0.10
+	github.com/go-bamboo/pkg v0.0.11
 	github.com/go-kratos/kratos/v2 v2.5.2
 	go.opentelemetry.io/otel v1.11.1
 	go.opentelemetry.io/otel/trace v1.11.1
@@ -74,4 +74,4 @@ require (
 	gopkg.in/yaml.v3 v3.0.1 // indirect
 )
 
-replace github.com/go-kratos/kratos/v2 v2.5.2 => github.com/go-bamboo/kratos/v2 v2.4.0
+replace github.com/go-kratos/kratos/v2 v2.5.2 => github.com/go-bamboo/kratos/v2 v2.5.2
