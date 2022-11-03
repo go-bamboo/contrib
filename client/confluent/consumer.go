@@ -172,7 +172,7 @@ func (c *kafkaQueue) consumGroupTopic(topics []string) {
 			}
 			switch msg := ev.(type) {
 			case *kafka.Message:
-				log.Debugw("handle block msg", "headers", msg.Headers, "topic", msg.TopicPartition.Topic, "Partition", msg.TopicPartition.Partition, "Offset", msg.TopicPartition.Offset)
+				log.Debugw("handle kafka msg", "headers", msg.Headers, "topic", msg.TopicPartition.Topic, "Partition", msg.TopicPartition.Partition, "Offset", msg.TopicPartition.Offset)
 				if err := c.handler.Consume(cCtx, *msg.TopicPartition.Topic, msg.Key, msg.Value); err != nil {
 					// 直接放弃的消息
 					se := errors.FromError(err)
@@ -185,7 +185,7 @@ func (c *kafkaQueue) consumGroupTopic(topics []string) {
 					span.RecordError(err)
 					log.Errorf("err: %v", err)
 				} else {
-					log.Debugf("-----------------------------------commit message end: %v", tp)
+					log.Debugf("--------------commit message end: %v", tp)
 				}
 			case kafka.PartitionEOF:
 				log.Errorw(fmt.Sprintf("%+v", msg.Error), "topic", msg.Topic, "Partition", msg.Partition, "Offset", msg.Offset)
