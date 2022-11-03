@@ -34,5 +34,6 @@ message ProducerConf {
   int32 acks = 6;
   string partitioner = 7;
   int32 request_timeout_ms = 8;
-  string topic = 9;
+  string group = 9;
+  string topic = 10;
 }
