@@ -117,7 +117,10 @@ func (ctrct *Media) GetTokenIdByContentHash(ctx context.Context, from common.Add
 }
 
 func (ctrct *Media) Mint(ctx context.Context, chainID *big.Int, from common.Address, fromPriv *ecdsa.PrivateKey, nonce *big.Int, tokenId *big.Int, tokenURI string, hash string) (txHash, rawTx string, err error) {
-	opts := bind.NewKeyedTransactor(fromPriv)
+	opts, err := bind.NewKeyedTransactorWithChainID(fromPriv, chainID)
+	if err != nil {
+		return
+	}
 	opts.Nonce = nonce
 	opts.GasLimit = 1000000
 	opts.Signer = func(a common.Address, t *types.Transaction) (*types.Transaction, error) {
@@ -143,7 +146,10 @@ func (ctrct *Media) Mint(ctx context.Context, chainID *big.Int, from common.Addr
 }
 
 func (ctrct *Media) MintForCreator(ctx context.Context, chainID *big.Int, from common.Address, fromPriv *ecdsa.PrivateKey, to common.Address, nonce *big.Int, tokenId *big.Int, tokenURI string, hash string) (txHash, rawTx string, err error) {
-	opts := bind.NewKeyedTransactor(fromPriv)
+	opts, err := bind.NewKeyedTransactorWithChainID(fromPriv, chainID)
+	if err != nil {
+		return
+	}
 	opts.Nonce = nonce
 	opts.GasLimit = 1000000
 	opts.Signer = func(a common.Address, t *types.Transaction) (*types.Transaction, error) {
@@ -170,7 +176,10 @@ func (ctrct *Media) MintForCreator(ctx context.Context, chainID *big.Int, from c
 }
 
 func (ctrct *Media) MintWithSig(ctx context.Context, chainID *big.Int, from common.Address, fromPriv *ecdsa.PrivateKey, nonce *big.Int, tokenId *big.Int, tokenURI string, hash string) (txHash, rawTx string, err error) {
-	opts := bind.NewKeyedTransactor(fromPriv)
+	opts, err := bind.NewKeyedTransactorWithChainID(fromPriv, chainID)
+	if err != nil {
+		return
+	}
 	opts.Nonce = nonce
 	opts.GasLimit = 1000000
 	opts.Signer = func(a common.Address, t *types.Transaction) (*types.Transaction, error) {
@@ -198,7 +207,10 @@ func (ctrct *Media) MintWithSig(ctx context.Context, chainID *big.Int, from comm
 }
 
 func (ctrct *Media) UpdateTokenURI(ctx context.Context, chainID *big.Int, from common.Address, fromPriv *ecdsa.PrivateKey, nonce *big.Int, tokenId *big.Int, tokenURI string) (txHash, rawTx string, err error) {
-	opts := bind.NewKeyedTransactor(fromPriv)
+	opts, err := bind.NewKeyedTransactorWithChainID(fromPriv, chainID)
+	if err != nil {
+		return
+	}
 	opts.Nonce = nonce
 	opts.GasLimit = 1000000
 	opts.Signer = func(a common.Address, t *types.Transaction) (*types.Transaction, error) {
@@ -221,7 +233,10 @@ func (ctrct *Media) UpdateTokenURI(ctx context.Context, chainID *big.Int, from c
 }
 
 func (ctrct *Media) TransferFrom(ctx context.Context, chainID *big.Int, from common.Address, fromPriv *ecdsa.PrivateKey, nonce *big.Int, fromx common.Address, to common.Address, tokenId *big.Int) (txHash, rawTx string, err error) {
-	opts := bind.NewKeyedTransactor(fromPriv)
+	opts, err := bind.NewKeyedTransactorWithChainID(fromPriv, chainID)
+	if err != nil {
+		return
+	}
 	opts.Nonce = nonce
 	opts.GasLimit = 1000000
 	opts.Signer = func(a common.Address, t *types.Transaction) (*types.Transaction, error) {
@@ -243,7 +258,10 @@ func (ctrct *Media) TransferFrom(ctx context.Context, chainID *big.Int, from com
 }
 
 func (ctrct *Media) Burn(ctx context.Context, chainID *big.Int, from common.Address, fromPriv *ecdsa.PrivateKey, nonce *big.Int, tokenId *big.Int) (txHash, rawTx string, err error) {
-	opts := bind.NewKeyedTransactor(fromPriv)
+	opts, err := bind.NewKeyedTransactorWithChainID(fromPriv, chainID)
+	if err != nil {
+		return
+	}
 	opts.Nonce = nonce
 	opts.GasLimit = 1000000
 	opts.Signer = func(a common.Address, t *types.Transaction) (*types.Transaction, error) {
