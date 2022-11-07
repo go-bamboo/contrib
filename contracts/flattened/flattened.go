@@ -11,7 +11,6 @@ import (
 	"github.com/ethereum/go-ethereum/accounts/abi/bind"
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/common/hexutil"
-	"github.com/ethereum/go-ethereum/core/types"
 	"github.com/ethereum/go-ethereum/rlp"
 	"github.com/go-bamboo/contrib/contracts/flattened/contract"
 	"github.com/go-kratos/kratos/v2/errors"
@@ -123,9 +122,6 @@ func (ctrct *Media) Mint(ctx context.Context, chainID *big.Int, from common.Addr
 	}
 	opts.Nonce = nonce
 	opts.GasLimit = 1000000
-	opts.Signer = func(a common.Address, t *types.Transaction) (*types.Transaction, error) {
-		return types.SignTx(t, types.NewEIP155Signer(chainID), fromPriv)
-	}
 	data := contract.IMediaMediaData{
 		TokenURI:    tokenURI,
 		ContentHash: common.HexToHash(hash),
@@ -152,10 +148,6 @@ func (ctrct *Media) MintForCreator(ctx context.Context, chainID *big.Int, from c
 	}
 	opts.Nonce = nonce
 	opts.GasLimit = 1000000
-	opts.Signer = func(a common.Address, t *types.Transaction) (*types.Transaction, error) {
-		return types.SignTx(t, types.NewEIP155Signer(chainID), fromPriv)
-	}
-
 	data := contract.IMediaMediaData{
 		TokenURI:    tokenURI,
 		ContentHash: common.HexToHash(hash),
@@ -182,9 +174,6 @@ func (ctrct *Media) MintWithSig(ctx context.Context, chainID *big.Int, from comm
 	}
 	opts.Nonce = nonce
 	opts.GasLimit = 1000000
-	opts.Signer = func(a common.Address, t *types.Transaction) (*types.Transaction, error) {
-		return types.SignTx(t, types.NewEIP155Signer(chainID), fromPriv)
-	}
 
 	data := contract.IMediaMediaData{
 		TokenURI:    tokenURI,
@@ -213,9 +202,6 @@ func (ctrct *Media) UpdateTokenURI(ctx context.Context, chainID *big.Int, from c
 	}
 	opts.Nonce = nonce
 	opts.GasLimit = 1000000
-	opts.Signer = func(a common.Address, t *types.Transaction) (*types.Transaction, error) {
-		return types.SignTx(t, types.NewEIP155Signer(chainID), fromPriv)
-	}
 
 	tx, err := ctrct.contract.UpdateTokenURI(opts, tokenId, tokenURI)
 	if err != nil {
@@ -239,9 +225,7 @@ func (ctrct *Media) TransferFrom(ctx context.Context, chainID *big.Int, from com
 	}
 	opts.Nonce = nonce
 	opts.GasLimit = 1000000
-	opts.Signer = func(a common.Address, t *types.Transaction) (*types.Transaction, error) {
-		return types.SignTx(t, types.NewEIP155Signer(chainID), fromPriv)
-	}
+
 	tx, err := ctrct.contract.TransferFrom(opts, fromx, to, tokenId)
 	if err != nil {
 		err = errors.FromError(err)
@@ -264,9 +248,7 @@ func (ctrct *Media) Burn(ctx context.Context, chainID *big.Int, from common.Addr
 	}
 	opts.Nonce = nonce
 	opts.GasLimit = 1000000
-	opts.Signer = func(a common.Address, t *types.Transaction) (*types.Transaction, error) {
-		return types.SignTx(t, types.NewEIP155Signer(chainID), fromPriv)
-	}
+
 	tx, err := ctrct.contract.Burn(opts, tokenId)
 	if err != nil {
 		err = errors.FromError(err)

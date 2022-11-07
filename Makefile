@@ -8,11 +8,6 @@ KRATOS_VERSION=$(shell go mod graph |grep go-kratos/kratos/v2 |head -n 1 |awk -F
 KRATOS=$(GOPATH)/pkg/mod/github.com/go-kratos/kratos/v2@$(KRATOS_VERSION)
 PWD := $(shell pwd)
 
-.PHONY: init
-init:
-	go get -u google.golang.org/protobuf/cmd/protoc-gen-go
-	go get -u google.golang.org/grpc/cmd/protoc-gen-go-grpc
-
 .PHONY: proto
 proto:
 	protoc --proto_path=. \
@@ -21,15 +16,8 @@ proto:
            --proto_path=$(KRATOS)/third_party \
            --proto_path=$(PWD)/../third_party \
            --go_out=paths=source_relative:. \
-           --go-grpc_out=paths=source_relative:. \
-           --go-http_out=paths=source_relative:. \
-           --go-errors_out=paths=source_relative:. \
            --validate_out=lang=go,paths=source_relative:. \
-           --openapiv2_out=. $(PROTO_FILES)
-
-.PHONY: build
-build:
-	mkdir -p bin/ && go build -ldflags "-X main.Version=$(VERSION) -X main.Branch=$(BRANCH) -X main.Revision=$(REVISION) -X main.BuildDate=$(BUILD_DATE)" -o ./bin/ ./...
+           ./client/confluent/conf.proto
 
 .PHONY: test
 test:
