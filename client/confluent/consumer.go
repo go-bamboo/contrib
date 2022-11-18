@@ -180,19 +180,15 @@ func (c *kafkaQueue) consumGroupTopic(topics []string) {
 					span.RecordError(err)
 				}
 				// 确认消费
-				tp, err := c.sub.CommitMessage(msg)
+				_, err := c.sub.CommitMessage(msg)
 				if err != nil {
 					span.RecordError(err)
 					log.Errorf("err: %v", err)
-				} else {
-					log.Debugf("--------------commit message end: %v", tp)
 				}
 			case kafka.PartitionEOF:
 				log.Errorw(fmt.Sprintf("%+v", msg.Error), "topic", msg.Topic, "Partition", msg.Partition, "Offset", msg.Offset)
 			case kafka.OffsetsCommitted:
-				if len(msg.Offsets) > 0 {
-					log.Errorw(fmt.Sprintf("%+v", msg.Error), "topic", msg.Offsets[0].Topic, "Partition", msg.Offsets[0].Partition, "Offset", msg.Offsets[0].Offset)
-				}
+				log.Infof("kafka offsets committed", "topic", msg.Offsets[0].Topic, "Partition", msg.Offsets[0].Partition, "Offset", msg.Offsets[0].Offset)
 			case kafka.Error:
 				log.Errorw(fmt.Sprintf("%+v", msg.Error()), "code", msg.Code())
 			default:
