@@ -130,23 +130,6 @@ func (c *kafkaQueue) Stop(context.Context) error {
 	return nil
 }
 
-func (c *kafkaQueue) poll(ctx context.Context, timeoutMs int) (cctx context.Context, span trace.Span, ev kafka.Event) {
-	ev = c.sub.Poll(timeoutMs)
-	if ev != nil {
-		switch msg := ev.(type) {
-		case *kafka.Message:
-			cctx, span = c.tracer.Start(ctx, "sub:"+*msg.TopicPartition.Topic, trace.WithSpanKind(trace.SpanKindConsumer))
-			c.propagator.Inject(cctx, &KafkaMessageTextMapCarrier{msg: msg})
-			span.SetAttributes(
-				attribute.String("kafka.topic", *msg.TopicPartition.Topic),
-				attribute.String("kafka.key", string(msg.Key)),
-			)
-			return
-		}
-	}
-	return
-}
-
 func (c *kafkaQueue) consumGroupTopic(topics []string) {
 	defer rescue.Recover(func() {
 		c.wg.Done()
@@ -164,8 +147,7 @@ func (c *kafkaQueue) consumGroupTopic(topics []string) {
 			return
 		default:
 			// ms
-			cCtx, cf := context.WithTimeout(ctx, 60*time.Second)
-			cCtx, span, ev := c.poll(cCtx, 100)
+			ev := c.sub.Poll(1000)
 			if ev == nil {
 				time.Sleep(time.Second)
 				continue
@@ -173,7 +155,14 @@ func (c *kafkaQueue) consumGroupTopic(topics []string) {
 			switch msg := ev.(type) {
 			case *kafka.Message:
 				log.Debugw("handle kafka msg", "headers", msg.Headers, "topic", msg.TopicPartition.Topic, "Partition", msg.TopicPartition.Partition, "Offset", msg.TopicPartition.Offset)
-				if err := c.handler.Consume(cCtx, *msg.TopicPartition.Topic, msg.Key, msg.Value); err != nil {
+				cCtx, cf := context.WithTimeout(ctx, 60*time.Second)
+				cctx, span := c.tracer.Start(cCtx, "sub:"+*msg.TopicPartition.Topic, trace.WithSpanKind(trace.SpanKindConsumer))
+				c.propagator.Inject(cctx, &KafkaMessageTextMapCarrier{msg: msg})
+				span.SetAttributes(
+					attribute.String("kafka.topic", *msg.TopicPartition.Topic),
+					attribute.String("kafka.key", string(msg.Key)),
+				)
+				if err := c.handler.Consume(cctx, *msg.TopicPartition.Topic, msg.Key, msg.Value); err != nil {
 					// 直接放弃的消息
 					se := errors.FromError(err)
 					log.Errorw(fmt.Sprintf("%+v", err), "code", se.Code, "reason", se.Reason)
@@ -185,16 +174,16 @@ func (c *kafkaQueue) consumGroupTopic(topics []string) {
 					span.RecordError(err)
 					log.Errorf("err: %v", err)
 				}
-			case kafka.PartitionEOF:
-				log.Errorw(fmt.Sprintf("%+v", msg.Error), "topic", msg.Topic, "Partition", msg.Partition, "Offset", msg.Offset)
+				cf()
 			case kafka.OffsetsCommitted:
 				log.Infof("kafka offsets committed", "topic", msg.Offsets[0].Topic, "Partition", msg.Offsets[0].Partition, "Offset", msg.Offsets[0].Offset)
+			case kafka.PartitionEOF:
+				log.Errorw(fmt.Sprintf("%+v", msg.Error), "topic", msg.Topic, "Partition", msg.Partition, "Offset", msg.Offset)
 			case kafka.Error:
 				log.Errorw(fmt.Sprintf("%+v", msg.Error()), "code", msg.Code())
 			default:
 				log.Warnf("Ignored %v", msg)
 			}
-			cf()
 		}
 	}
 }
