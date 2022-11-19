@@ -139,7 +139,15 @@ func (c *kafkaQueue) consumGroupTopic(topics []string) {
 		log.Errorf("Failed to get %v the list of partition: %v", topics, err)
 		return
 	}
-	log.Infof("topics => %v", topics)
+	for _, val := range topics {
+		topic := val
+		md, err := c.sub.GetMetadata(&topic, false, 1000)
+		if err != nil {
+			continue
+		}
+		log.Infof("err: %v, partitions: %v", md.Topics[topic].Error, md.Topics[topic].Partitions)
+	}
+	log.Infof("topics => %v")
 	ctx := context.TODO()
 	for {
 		select {
@@ -154,27 +162,7 @@ func (c *kafkaQueue) consumGroupTopic(topics []string) {
 			}
 			switch msg := ev.(type) {
 			case *kafka.Message:
-				log.Debugw("handle kafka msg", "headers", msg.Headers, "topic", msg.TopicPartition.Topic, "Partition", msg.TopicPartition.Partition, "Offset", msg.TopicPartition.Offset)
-				cCtx, cf := context.WithTimeout(ctx, 60*time.Second)
-				cctx, span := c.tracer.Start(cCtx, "sub:"+*msg.TopicPartition.Topic, trace.WithSpanKind(trace.SpanKindConsumer))
-				c.propagator.Inject(cctx, &KafkaMessageTextMapCarrier{msg: msg})
-				span.SetAttributes(
-					attribute.String("kafka.topic", *msg.TopicPartition.Topic),
-					attribute.String("kafka.key", string(msg.Key)),
-				)
-				if err := c.handler.Consume(cctx, *msg.TopicPartition.Topic, msg.Key, msg.Value); err != nil {
-					// 直接放弃的消息
-					se := errors.FromError(err)
-					log.Errorw(fmt.Sprintf("%+v", err), "code", se.Code, "reason", se.Reason)
-					span.RecordError(err)
-				}
-				// 确认消费
-				_, err := c.sub.CommitMessage(msg)
-				if err != nil {
-					span.RecordError(err)
-					log.Errorf("err: %v", err)
-				}
-				cf()
+				c.handleKafkaMsg(ctx, msg)
 			case kafka.OffsetsCommitted:
 				log.Infof("kafka offsets committed", "topic", msg.Offsets[0].Topic, "Partition", msg.Offsets[0].Partition, "Offset", msg.Offsets[0].Offset)
 			case kafka.PartitionEOF:
@@ -185,5 +173,29 @@ func (c *kafkaQueue) consumGroupTopic(topics []string) {
 				log.Warnf("Ignored %v", msg)
 			}
 		}
+	}
+}
+
+func (c *kafkaQueue) handleKafkaMsg(ctx context.Context, msg *kafka.Message) {
+	log.Debugw("handle kafka msg", "headers", msg.Headers, "topic", msg.TopicPartition.Topic, "Partition", msg.TopicPartition.Partition, "Offset", msg.TopicPartition.Offset)
+	cCtx, cf := context.WithTimeout(ctx, 60*time.Second)
+	defer cf()
+	cctx, span := c.tracer.Start(cCtx, "sub:"+*msg.TopicPartition.Topic, trace.WithSpanKind(trace.SpanKindConsumer))
+	c.propagator.Inject(cctx, &KafkaMessageTextMapCarrier{msg: msg})
+	span.SetAttributes(
+		attribute.String("kafka.topic", *msg.TopicPartition.Topic),
+		attribute.String("kafka.key", string(msg.Key)),
+	)
+	if err := c.handler.Consume(cctx, *msg.TopicPartition.Topic, msg.Key, msg.Value); err != nil {
+		// 直接放弃的消息
+		se := errors.FromError(err)
+		log.Errorw(fmt.Sprintf("%+v", err), "code", se.Code, "reason", se.Reason)
+		span.RecordError(err)
+	}
+	// 确认消费
+	_, err := c.sub.CommitMessage(msg)
+	if err != nil {
+		span.RecordError(err)
+		log.Errorf("err: %v", err)
 	}
 }
