@@ -139,15 +139,6 @@ func (c *kafkaQueue) consumGroupTopic(topics []string) {
 		log.Errorf("Failed to get %v the list of partition: %v", topics, err)
 		return
 	}
-	for _, val := range topics {
-		topic := val
-		md, err := c.sub.GetMetadata(&topic, false, 1000)
-		if err != nil {
-			continue
-		}
-		log.Infof("err: %v, partitions: %v", md.Topics[topic].Error, md.Topics[topic].Partitions)
-	}
-	log.Infof("topics => %v")
 	ctx := context.TODO()
 	for {
 		select {
