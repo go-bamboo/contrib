@@ -155,7 +155,7 @@ func (c *kafkaQueue) consumGroupTopic(topics []string) {
 			case *kafka.Message:
 				c.handleKafkaMsg(ctx, msg)
 			case kafka.OffsetsCommitted:
-				log.Infof("kafka offsets committed", "topic", msg.Offsets[0].Topic, "Partition", msg.Offsets[0].Partition, "Offset", msg.Offsets[0].Offset)
+				log.Infow("kafka offsets committed", "topic", msg.Offsets[0].Topic, "Partition", msg.Offsets[0].Partition, "Offset", msg.Offsets[0].Offset)
 			case kafka.PartitionEOF:
 				log.Errorw(fmt.Sprintf("%+v", msg.Error), "topic", msg.Topic, "Partition", msg.Partition, "Offset", msg.Offset)
 			case kafka.Error:
