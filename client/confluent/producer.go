@@ -2,11 +2,10 @@ package confluent
 
 import (
 	"context"
-
 	"github.com/confluentinc/confluent-kafka-go/kafka"
 	"github.com/go-bamboo/pkg/log"
+	otelext "github.com/go-bamboo/pkg/otel"
 	"github.com/go-bamboo/pkg/queue"
-	"github.com/go-bamboo/pkg/tracing"
 	"github.com/go-kratos/kratos/v2/metrics"
 	"go.opentelemetry.io/otel"
 	"go.opentelemetry.io/otel/attribute"
@@ -50,7 +49,7 @@ func NewPusher(c *ProducerConf) (queue.Pusher, error) {
 	tracingPub := &KafkaProducer{
 		pub:        pub,
 		tracer:     otel.Tracer("kafka"),
-		propagator: propagation.NewCompositeTextMapPropagator(tracing.Metadata{}, propagation.Baggage{}, tracing.TraceContext{}),
+		propagator: propagation.NewCompositeTextMapPropagator(otelext.Metadata{}, propagation.Baggage{}, otelext.TraceContext{}),
 		// topic:      c.Topic,
 	}
 	return tracingPub, nil

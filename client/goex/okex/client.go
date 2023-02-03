@@ -7,10 +7,9 @@ import (
 	"sync"
 	"time"
 
+	"github.com/ethereum/go-ethereum/event"
 	"github.com/go-bamboo/pkg/log"
 	"github.com/go-bamboo/pkg/tools"
-
-	"github.com/ethereum/go-ethereum/event"
 	"github.com/gorilla/websocket"
 )
 

@@ -4,11 +4,14 @@ import (
 	"strings"
 
 	"github.com/confluentinc/confluent-kafka-go/kafka"
+	"go.opentelemetry.io/otel/propagation"
 )
 
 type KafkaMessageTextMapCarrier struct {
 	msg *kafka.Message
 }
+
+var _ propagation.TextMapCarrier = &KafkaMessageTextMapCarrier{}
 
 // Get returns the value associated with the passed key.
 func (carrier *KafkaMessageTextMapCarrier) Get(key string) string {

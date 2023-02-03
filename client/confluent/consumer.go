@@ -8,9 +8,9 @@ import (
 
 	"github.com/confluentinc/confluent-kafka-go/kafka"
 	"github.com/go-bamboo/pkg/log"
+	otelext "github.com/go-bamboo/pkg/otel"
 	"github.com/go-bamboo/pkg/queue"
 	"github.com/go-bamboo/pkg/rescue"
-	"github.com/go-bamboo/pkg/tracing"
 	"github.com/go-kratos/kratos/v2/errors"
 	"github.com/go-kratos/kratos/v2/metrics"
 	"go.opentelemetry.io/otel"
@@ -104,7 +104,7 @@ func newKafkaQueue(c *ConsumerConf, handler queue.ConsumeHandler) (k *kafkaQueue
 
 		sub:        sub,
 		tracer:     otel.Tracer("kafka"),
-		propagator: propagation.NewCompositeTextMapPropagator(tracing.Metadata{}, propagation.Baggage{}, tracing.TraceContext{}),
+		propagator: propagation.NewCompositeTextMapPropagator(otelext.Metadata{}, propagation.Baggage{}, otelext.TraceContext{}),
 
 		ctx: ctx,
 		cf:  cf,
