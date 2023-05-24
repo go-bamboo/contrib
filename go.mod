@@ -5,7 +5,7 @@ go 1.18
 require (
 	github.com/confluentinc/confluent-kafka-go v1.9.2
 	github.com/ethereum/go-ethereum v1.10.25
-	github.com/go-bamboo/pkg v0.0.27
+	github.com/go-bamboo/pkg v0.0.34-0.20230523023312-c464251769b0
 	github.com/go-kratos/kratos/v2 v2.5.3
 	github.com/gorilla/websocket v1.5.0
 	github.com/stretchr/testify v1.8.1

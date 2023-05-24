@@ -140,6 +140,8 @@ github.com/gballet/go-libpcsclite v0.0.0-20190607065134-2772fd86a8ff h1:tY80oXqG
 github.com/ghodss/yaml v1.0.0/go.mod h1:4dBDuWmgqj2HViK6kFavaiC9ZROes6MMH2rRYeMEF04=
 github.com/go-bamboo/pkg v0.0.27 h1:lqKCsYzB9HOSXSIQeYXxjVEe5/6rQJvB2AP34J4QpVM=
 github.com/go-bamboo/pkg v0.0.27/go.mod h1:U8hq5GiuE1xV9I5hl/gJleG38Njx63Eouc6RSXWGmU0=
+github.com/go-bamboo/pkg v0.0.34-0.20230523023312-c464251769b0 h1:mNlclbEhZo/l/aDytOGRGU+2YqmKb7+hIlCACg4lNgY=
+github.com/go-bamboo/pkg v0.0.34-0.20230523023312-c464251769b0/go.mod h1:NKz3VwtqAI2ZIUTZy0nozb/Q/iok3CfCSzTdStrUAf8=
 github.com/go-gl/glfw v0.0.0-20190409004039-e6da0acd62b1/go.mod h1:vR7hzQXu2zJy9AVAgeJqvqgH9Q5CA+iKCZ2gyEVpxRU=
 github.com/go-gl/glfw/v3.3/glfw v0.0.0-20191125211704-12ad95a8df72/go.mod h1:tQ2UAYgL5IevRw8kRxooKSPJfGvJ9fJQFa0TUsXzTg8=
 github.com/go-gl/glfw/v3.3/glfw v0.0.0-20200222043503-6f7a984d4dc4/go.mod h1:tQ2UAYgL5IevRw8kRxooKSPJfGvJ9fJQFa0TUsXzTg8=
