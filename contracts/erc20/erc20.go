@@ -4,6 +4,9 @@ package erc20
 
 import (
 	"context"
+	"crypto/ecdsa"
+	"github.com/ethereum/go-ethereum/common/hexutil"
+	"github.com/ethereum/go-ethereum/rlp"
 	"math/big"
 
 	"github.com/ethereum/go-ethereum/accounts/abi/bind"
@@ -49,4 +52,29 @@ func (c *Erc20) BalanceOf(ctx context.Context, from common.Address) (*big.Int, e
 		return in, errors.FromError(err)
 	}
 	return in, nil
+}
+
+func (c *Erc20) SendToken(ctx context.Context, chainID *big.Int, fromPriv *ecdsa.PrivateKey, nonce *big.Int, from common.Address, to common.Address, value *big.Int) (txHash, rawTx string, err error) {
+	opts, err := bind.NewKeyedTransactorWithChainID(fromPriv, chainID)
+	if err != nil {
+		return
+	}
+	opts.Context = ctx
+	opts.Nonce = nonce
+	opts.Value = big.NewInt(0)
+	opts.GasLimit = 400000
+
+	tx, err := c.contract.TransferFrom(opts, from, to, value)
+	if err != nil {
+		err = errors.FromError(err)
+		return
+	}
+	txHash = tx.Hash().Hex()
+	rawTxBytes, err := rlp.EncodeToBytes(tx)
+	if err != nil {
+		err = errors.FromError(err)
+		return
+	}
+	rawTx = hexutil.Encode(rawTxBytes)
+	return
 }
