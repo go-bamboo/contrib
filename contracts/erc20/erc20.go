@@ -5,12 +5,12 @@ package erc20
 import (
 	"context"
 	"crypto/ecdsa"
-	"github.com/ethereum/go-ethereum/common/hexutil"
-	"github.com/ethereum/go-ethereum/rlp"
 	"math/big"
 
 	"github.com/ethereum/go-ethereum/accounts/abi/bind"
 	"github.com/ethereum/go-ethereum/common"
+	"github.com/ethereum/go-ethereum/common/hexutil"
+	"github.com/ethereum/go-ethereum/rlp"
 	"github.com/go-bamboo/contrib/contracts/erc20/contract"
 	"github.com/go-kratos/kratos/v2/errors"
 )
@@ -54,16 +54,14 @@ func (c *Erc20) BalanceOf(ctx context.Context, from common.Address) (*big.Int, e
 	return in, nil
 }
 
-func (c *Erc20) SendToken(ctx context.Context, chainID *big.Int, fromPriv *ecdsa.PrivateKey, nonce *big.Int, from common.Address, to common.Address, value *big.Int) (txHash, rawTx string, err error) {
-	opts, err := bind.NewKeyedTransactorWithChainID(fromPriv, chainID)
+func (c *Erc20) TransferFrom(ctx context.Context, chainID *big.Int, pk *ecdsa.PrivateKey, nonce *big.Int, from common.Address, to common.Address, value *big.Int) (txHash, rawTx string, err error) {
+	opts, err := bind.NewKeyedTransactorWithChainID(pk, chainID)
 	if err != nil {
 		return
 	}
 	opts.Context = ctx
 	opts.Nonce = nonce
 	opts.Value = big.NewInt(0)
-	opts.GasLimit = 400000
-
 	tx, err := c.contract.TransferFrom(opts, from, to, value)
 	if err != nil {
 		err = errors.FromError(err)
