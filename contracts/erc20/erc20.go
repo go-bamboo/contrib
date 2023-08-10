@@ -54,6 +54,17 @@ func (c *Erc20) BalanceOf(ctx context.Context, from common.Address) (*big.Int, e
 	return in, nil
 }
 
+func (c *Erc20) Decimals(ctx context.Context) (uint8, error) {
+	opts := &bind.CallOpts{
+		Context: ctx,
+	}
+	in, err := c.contract.Decimals(opts)
+	if err != nil {
+		return in, errors.FromError(err)
+	}
+	return in, nil
+}
+
 func (c *Erc20) TransferFrom(ctx context.Context, chainID *big.Int, pk *ecdsa.PrivateKey, nonce *big.Int, from common.Address, to common.Address, value *big.Int) (txHash, rawTx string, err error) {
 	opts, err := bind.NewKeyedTransactorWithChainID(pk, chainID)
 	if err != nil {
