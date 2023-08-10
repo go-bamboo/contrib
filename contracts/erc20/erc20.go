@@ -87,3 +87,26 @@ func (c *Erc20) TransferFrom(ctx context.Context, chainID *big.Int, pk *ecdsa.Pr
 	rawTx = hexutil.Encode(rawTxBytes)
 	return
 }
+
+func (c *Erc20) Transfer(ctx context.Context, chainID *big.Int, pk *ecdsa.PrivateKey, nonce *big.Int, from common.Address, to common.Address, value *big.Int) (txHash, rawTx string, err error) {
+	opts, err := bind.NewKeyedTransactorWithChainID(pk, chainID)
+	if err != nil {
+		return
+	}
+	opts.Context = ctx
+	opts.Nonce = nonce
+	opts.Value = big.NewInt(0)
+	tx, err := c.contract.Transfer(opts, to, value)
+	if err != nil {
+		err = errors.FromError(err)
+		return
+	}
+	txHash = tx.Hash().Hex()
+	rawTxBytes, err := rlp.EncodeToBytes(tx)
+	if err != nil {
+		err = errors.FromError(err)
+		return
+	}
+	rawTx = hexutil.Encode(rawTxBytes)
+	return
+}
