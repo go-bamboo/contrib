@@ -88,7 +88,7 @@ func (c *Erc20) TransferFrom(ctx context.Context, chainID *big.Int, pk *ecdsa.Pr
 	return
 }
 
-func (c *Erc20) Transfer(ctx context.Context, chainID *big.Int, pk *ecdsa.PrivateKey, nonce *big.Int, from common.Address, to common.Address, value *big.Int) (txHash, rawTx string, err error) {
+func (c *Erc20) Transfer(ctx context.Context, chainID *big.Int, pk *ecdsa.PrivateKey, nonce *big.Int, to common.Address, value *big.Int) (txHash, rawTx string, err error) {
 	opts, err := bind.NewKeyedTransactorWithChainID(pk, chainID)
 	if err != nil {
 		return
