@@ -7,10 +7,9 @@ import (
 	"sync"
 	"time"
 
-	"github.com/go-bamboo/pkg/log"
-	"github.com/go-bamboo/pkg/tools"
-
 	"github.com/ethereum/go-ethereum/event"
+	"github.com/go-bamboo/pkg/log"
+	"github.com/go-bamboo/pkg/uuid"
 	"github.com/gorilla/websocket"
 )
 
@@ -45,7 +44,7 @@ func New(opts ...Option) *Client {
 		APIKey:    defaultOpts.apiKey,
 		SecretKey: defaultOpts.secretKey,
 		BaseURL:   defaultOpts.baseURL,
-		Id:        tools.GetUUID(),
+		Id:        uuid.New(),
 		message:   make(chan []byte, 256),
 		ctx:       cCtx,
 		ctxCancel: cCancel,

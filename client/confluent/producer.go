@@ -6,9 +6,9 @@ import (
 	"github.com/go-bamboo/pkg/log"
 	otelext "github.com/go-bamboo/pkg/otel"
 	"github.com/go-bamboo/pkg/queue"
-	"github.com/go-kratos/kratos/v2/metrics"
 	"go.opentelemetry.io/otel"
 	"go.opentelemetry.io/otel/attribute"
+	"go.opentelemetry.io/otel/metric"
 	"go.opentelemetry.io/otel/propagation"
 	"go.opentelemetry.io/otel/trace"
 )
@@ -18,7 +18,7 @@ type KafkaProducer struct {
 	pub        *kafka.Producer
 	tracer     trace.Tracer
 	propagator propagation.TextMapPropagator
-	pubCounter metrics.Counter // 发送次数
+	pubCounter metric.Int64Counter // 发送次数
 	// topic      string
 }
 
